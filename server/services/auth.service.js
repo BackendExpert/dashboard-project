@@ -11,8 +11,13 @@ const logUserAction = require("../utils/others/logUserAction")
 
 const createAccountEmail = require("../templates/email/auth.template")
 
+const {
+    CreateAccountResDTO,
+    CreateLoginResDTO
+} = require("../dtos/auth.dto")
+
 class AuthService {
-    static async createAuth(data, token, req) {
+    static async createAuth(data, req) {
         const existingOTP = await OTP.findOne({ email: data.email })
         if (!existingOTP) {
             throw new Error("The OTP Already Send to you Email")
@@ -37,7 +42,7 @@ class AuthService {
             }
 
             user = await User.create({
-                email,
+                email: data.email,
                 role: role._id,
                 isActive: true,
                 isEmailVerified: false
@@ -46,17 +51,22 @@ class AuthService {
             await logUserAction(
                 req,
                 "REGISTER_OTP_SENT",
-                "Registration OTP sent",
+                `Registration OTP sent ${data.email}`,
                 this._meta(req),
                 user._id
             );
 
+            return CreateAccountResDTO(otptoken)
         }
+        await logUserAction(
+            req,
+            "LOGIN_OTP_SENT",
+            `Login OTP sent ${data.email}`,
+            this._meta(req),
+            user._id
+        );
 
-
-
-
-
+        return CreateAccountResDTO(otptoken)
     }
 }
 
