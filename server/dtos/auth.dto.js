@@ -4,6 +4,13 @@ exports.CreateAuthDTO = (data) => ({
     },
 });
 
+exports.VerifyLoginDTO = (data, token) => ({
+    data: {
+        otp: String(data?.title || "").trim(),
+    },
+    token: String(token).trim(),
+});
+
 exports.CreateAccountResDTO = (token, message = "Account created successfully, and OTP send to your Email") => ({
     success: true,
     token,
