@@ -1,12 +1,12 @@
 exports.CreateAuthDTO = (data) => ({
     data: {
-        email: String(data?.title || "").trim(),
+        email: String(data?.email || "").trim(),
     },
 });
 
 exports.VerifyLoginDTO = (data, token) => ({
     data: {
-        otp: String(data?.title || "").trim(),
+        otp: String(data?.otp || "").trim(),
     },
     token: String(token).trim(),
 });

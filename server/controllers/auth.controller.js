@@ -2,6 +2,7 @@ const AuthService = require("../services/auth.service");
 
 const {
     CreateAuthDTO,
+    VerifyLoginDTO,
     ErrorResDTO,
 } = require("../dtos/auth.dto")
 

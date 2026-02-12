@@ -22,19 +22,21 @@ const verifyToken = require("../utils/tokens/verifyToken")
 class AuthService {
     static async createAuth(data, req) {
         const existingOTP = await OTP.findOne({ email: data.email })
-        if (!existingOTP) {
+        if (existingOTP) {
             throw new Error("The OTP Already Send to you Email")
         }
 
-        const user = await User.findOne({ email: data.email })
+        let user = await User.findOne({ email: data.email });
+
 
         const otp = genarateOTP()
         const hashotp = await bcrypt.hash(otp, 10)
+        await OTP.create({ email: data.email, otp: hashotp });
 
         await createAccountEmail(data.email, otp)
 
         const otptoken = generateToken(
-            { email, type: "OTP_VERIFY" },
+            { email: data.email, type: "OTP_VERIFY" },
             "5min"
         )
 
@@ -87,6 +89,19 @@ class AuthService {
         const userOTP = await OTP.findOne({ email });
         const isValid = await bcrypt.compare(data.otp, userOTP.otp);
 
+
+        if (!isValid) {
+            await logUserAction(
+                req,
+                "OTP_WRONG",
+                `Login OTP MissMatch ${user.email}`,
+                this._meta(req),
+                user._id
+            );
+            throw new Error("Password is Not Match")
+        }
+
+
         //  success
         await OTP.deleteOne({ email });
         const role = await Role.findById(user.role);
@@ -105,7 +120,7 @@ class AuthService {
             user._id
         );
 
-        await NotificationEmail(data.email, `Login Successfully ${this._meta(req)}`)
+        await NotificationEmail(user.email, `Login Successfully`, this._meta(req))
         return VerifyLoginResDTO(jwt);
 
     }
