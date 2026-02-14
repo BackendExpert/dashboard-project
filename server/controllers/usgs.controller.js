@@ -1,11 +1,15 @@
 const USGSWaterService = require("../services/usgs.service");
 
+const {
+    ErrorResDTO
+} = require("../dtos/usgs.dto")
+
 const USGSController = {
     getusgsStation: async (req, res) => {
         try {
             const {
                 stateCode
-            } = req.body
+            } = req.query
 
             const result = await USGSWaterService.getStationbyState(
                 stateCode
