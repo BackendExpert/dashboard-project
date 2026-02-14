@@ -7,4 +7,6 @@ const router = express.Router();
 
 router.get('/get-station', auth, checkPermission(['usgs:get-station']), USGSController.getusgsStation)
 
+router.get('/station-data/:id', auth, checkPermission(['usgs:station-data']), USGSController.getstationData)
+
 module.exports = router;

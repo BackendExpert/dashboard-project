@@ -19,6 +19,18 @@ const USGSController = {
         catch (err) {
             res.status(400).json(ErrorResDTO(err.message));
         }
+    },
+
+    getstationData: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            const result = await USGSWaterService.getStationData(id)
+            res.status(200).json(result)
+        }
+        catch (err) {
+            res.status(400).json(ErrorResDTO(err.message));
+        }
     }
 };
 
