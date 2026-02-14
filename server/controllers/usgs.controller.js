@@ -3,10 +3,13 @@ const USGSWaterService = require("../services/usgs.service");
 const USGSController = {
     getusgsStation: async (req, res) => {
         try {
+            const {
+                stateCode
+            } = req.body
+
             const result = await USGSWaterService.getStationbyState(
                 stateCode
             )
-
             res.status(200).json(result)
         }
         catch (err) {
