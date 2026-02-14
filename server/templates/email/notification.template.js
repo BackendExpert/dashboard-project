@@ -1,11 +1,21 @@
 const sendEmail = require("../../utils/emails/emailTransporter");
 
-async function NotificationEmail(email, notification) {
-    const displayName = email.split("@")[0];
+async function NotificationEmail(email, notification, meta) {
+    if (!email || typeof email !== "string") {
+        throw new Error("Invalid email provided to NotificationEmail");
+    }
+
+    const displayName = email.includes("@")
+        ? email.split("@")[0]
+        : "User";
+
+    const loginTime = new Date(meta.timestamp).toLocaleString();
+    const device = meta.userAgent || "Unknown device";
+    const ipAddress = meta.ipAddress || "Unknown IP";
 
     await sendEmail({
         to: email,
-        subject: `Notification from – ${process.env.PROJECT_NAME}`,
+        subject: `Login Notification – ${process.env.PROJECT_NAME}`,
         html: `
             <div style="
                 background-color: #f1f5f9;
@@ -21,37 +31,31 @@ async function NotificationEmail(email, notification) {
                     box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
                 ">
 
-                    <!-- Top Accent -->
                     <div style="
                         height: 6px;
                         background: linear-gradient(90deg, #6366f1, #22c55e);
                     "></div>
 
-                    <!-- Header -->
                     <div style="padding: 34px 40px 20px;">
                         <h1 style="
                             margin: 0;
                             font-size: 26px;
                             font-weight: 800;
                             color: #0f172a;
-                            letter-spacing: -0.3px;
                         ">
                             ${process.env.PROJECT_NAME}
                         </h1>
-
                         <p style="
                             margin-top: 8px;
                             font-size: 15px;
                             color: #64748b;
                         ">
-                            System Notification
+                            New Login Detected
                         </p>
                     </div>
 
-                    <!-- Divider -->
                     <div style="height: 1px; background-color: #e5e7eb;"></div>
 
-                    <!-- Content -->
                     <div style="padding: 32px 40px;">
                         <p style="
                             font-size: 16px;
@@ -65,25 +69,33 @@ async function NotificationEmail(email, notification) {
                             font-size: 15.5px;
                             line-height: 1.7;
                             color: #475569;
-                            margin-bottom: 26px;
+                            margin-bottom: 22px;
                         ">
                             ${notification}
                         </p>
 
+                        <!-- Login Info Box -->
                         <div style="
-                            margin-top: 28px;
-                            padding: 18px;
                             background-color: #f8fafc;
-                            border-radius: 12px;
+                            border-radius: 14px;
+                            padding: 20px;
                             font-size: 14px;
-                            color: #475569;
+                            color: #334155;
                         ">
-                            This is an automated system notification.  
-                            Please do not reply to this email.
+                            <p><strong>Time:</strong> ${loginTime}</p>
+                            <p><strong>Device:</strong> ${device}</p>
+                            <p><strong>IP Address:</strong> ${ipAddress}</p>
                         </div>
+
+                        <p style="
+                            margin-top: 22px;
+                            font-size: 14px;
+                            color: #64748b;
+                        ">
+                            If this wasn’t you, please secure your account immediately.
+                        </p>
                     </div>
 
-                    <!-- Footer -->
                     <div style="
                         padding: 26px 40px;
                         background-color: #f1f5f9;
